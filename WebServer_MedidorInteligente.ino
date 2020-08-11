@@ -7,12 +7,17 @@
 #include <Arduino_JSON.h>
 #include <HTTPClient.h>
 
-struct tm timeinfo; //struct que contem as informações de tempo. ref: http://www.cplusplus.com/reference/ctime/tm/
 String html, header;
 String meses [12] = {"JAN", "FEV", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"};
 
+struct tm timeinfo; //struct que contem as informações de tempo. ref: http://www.cplusplus.com/reference/ctime/tm/
 int maxAmount = 7, //  Quantidad maxima de pontos que podem ser exibidos no grafico, começando em 7 [dias]
     hdmAtual = timeinfo.tm_mday;   //  "Hora", "Dia" ou "Mês"  atual
+
+//configurações de tempo:
+const char* ntpServer = "pool.ntp.org"; //de onde coletá-las
+const long  gmtOffset_sec = -10800;     //fuso horario
+const int   daylightOffset_sec = 0;     //horario de verao
 
 float  consumo_diario[31], //31 dias
        consumo_mensal[12], //12 meses
@@ -23,17 +28,12 @@ float  consumo_diario[31], //31 dias
        precokWh = 0,
        dinheiroPorDia = 0,
        dinheiroPorMes = 0,
-       meta;
+       meta = 0;
 
 //variaveis relacionadas ao API:
-String jsonBuffer;
-int TariffFlag_number = 0;
-String TariffFlag_name = "Verde";
-
-//configurações de tempo:
-const char* ntpServer = "pool.ntp.org"; //de onde coletá-las
-const long  gmtOffset_sec = -10800;     //fuso horario
-const int   daylightOffset_sec = 0;     //horario de verao
+//String jsonBuffer;
+//int TariffFlag_number = 0;
+//String TariffFlag_name = "Verde";
 
 //variaveis relacionadas ao ThingSpeak:
 unsigned long myChannelNumber = 1076260;
@@ -73,7 +73,6 @@ void setup() {
 
   //configurações de ThingSpeak:
   WiFi.mode(WIFI_STA);
-
   ThingSpeak.begin(client);  // Initialize ThingSpeak
 
   for (int i = 0; i < 31; i++) {
